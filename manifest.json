@@ -1,0 +1,30 @@
+{
+  "id": "synthetic-data-generator",
+  "title": "Synthetic Data Generator App",
+  "industry": "AI/ML Platforms & Dev Tools",
+  "industryId": "ai-ml-platforms-dev-tools",
+  "specialization": "Synthetic Data Generator",
+  "sourcePlatformGroup": "ai-agent-infrastructure-platform",
+  "sources": [
+    "AIMergededuplicate",
+    "AIMonitorrealtimeaudi",
+    "AISyntheticDataGenerator",
+    "AiDataAnalyst"
+  ],
+  "featureCount": 255,
+  "candidateFeatureCount": 336,
+  "eliminatedSimilarFeatures": 81,
+  "evidenceCount": 1547,
+  "aiPageCount": 0,
+  "sourceAIPageCount": 0,
+  "featureEvidencePolicy": "Existing source routes, pages, APIs, models, schemas, and navigation only",
+  "optimizationPolicy": "Equivalent feature names are consolidated once per industry and assigned to one canonical app owner",
+  "database": "database.sqlite",
+  "databaseSeed": {
+    "seededProjects": 0,
+    "seededTables": 0,
+    "seededRows": 0
+  },
+  "visibleFeatureCount": 152,
+  "featureVisibilityMode": "source-backed-fallback"
+}
