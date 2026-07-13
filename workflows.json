@@ -1,0 +1,730 @@
+{
+  "version": 1,
+  "appId": "synthetic-data-generator",
+  "workflows": [
+    {
+      "id": "dataset-intake",
+      "title": "Dataset Intake",
+      "description": "Register a local source dataset, intended use, ownership, sensitivity, and authorization before profiling.",
+      "fields": [
+        {
+          "key": "datasetName",
+          "label": "Dataset name",
+          "type": "text",
+          "required": true,
+          "default": "Demo customer support events"
+        },
+        {
+          "key": "source",
+          "label": "Source",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Local CSV fixture",
+            "Local database",
+            "Sandbox connector"
+          ],
+          "default": "Local CSV fixture"
+        },
+        {
+          "key": "intendedUse",
+          "label": "Intended use",
+          "type": "textarea",
+          "required": true,
+          "default": "Test a support-routing model without exposing production customer records."
+        },
+        {
+          "key": "dataOwner",
+          "label": "Data owner",
+          "type": "text",
+          "required": true,
+          "default": "Demo Analytics Team"
+        },
+        {
+          "key": "sensitivity",
+          "label": "Sensitivity",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Public",
+            "Internal",
+            "Confidential",
+            "Restricted"
+          ],
+          "default": "Confidential"
+        }
+      ],
+      "states": [
+        "draft",
+        "access_review",
+        "accepted",
+        "rejected"
+      ],
+      "transitions": [
+        {
+          "id": "dataset-intake-access_review",
+          "label": "Move to access review",
+          "from": [
+            "draft"
+          ],
+          "to": "access_review"
+        },
+        {
+          "id": "dataset-intake-accepted",
+          "label": "Move to accepted",
+          "from": [
+            "access_review"
+          ],
+          "to": "accepted"
+        },
+        {
+          "id": "dataset-intake-rejected",
+          "label": "Move to rejected",
+          "from": [
+            "accepted"
+          ],
+          "to": "rejected"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "dataset-intake-demo",
+          "state": "draft",
+          "datasetName": "Demo customer support events",
+          "source": "Local CSV fixture",
+          "intendedUse": "Test a support-routing model without exposing production customer records.",
+          "dataOwner": "Demo Analytics Team",
+          "sensitivity": "Confidential"
+        }
+      ]
+    },
+    {
+      "id": "schema-inference-review",
+      "title": "Schema Inference Review",
+      "description": "Infer field types and relationships, resolve ambiguities, and approve a generation-ready schema.",
+      "fields": [
+        {
+          "key": "datasetName",
+          "label": "Dataset name",
+          "type": "text",
+          "required": true,
+          "default": "Demo customer support events"
+        },
+        {
+          "key": "rowCount",
+          "label": "Source row count",
+          "type": "number",
+          "required": true,
+          "default": 25000
+        },
+        {
+          "key": "fieldCount",
+          "label": "Field count",
+          "type": "number",
+          "required": true,
+          "default": 18
+        },
+        {
+          "key": "ambiguousFields",
+          "label": "Ambiguous fields",
+          "type": "textarea",
+          "required": true,
+          "default": "account_code; resolution_time; satisfaction_label"
+        },
+        {
+          "key": "schemaVersion",
+          "label": "Schema version",
+          "type": "text",
+          "required": true,
+          "default": "schema-demo-v1"
+        }
+      ],
+      "states": [
+        "profiling",
+        "inferred",
+        "analyst_review",
+        "approved"
+      ],
+      "transitions": [
+        {
+          "id": "schema-inference-review-inferred",
+          "label": "Move to inferred",
+          "from": [
+            "profiling"
+          ],
+          "to": "inferred"
+        },
+        {
+          "id": "schema-inference-review-analyst_review",
+          "label": "Move to analyst review",
+          "from": [
+            "inferred"
+          ],
+          "to": "analyst_review"
+        },
+        {
+          "id": "schema-inference-review-approved",
+          "label": "Move to approved",
+          "from": [
+            "analyst_review"
+          ],
+          "to": "approved"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "schema-inference-review-demo",
+          "state": "profiling",
+          "datasetName": "Demo customer support events",
+          "rowCount": 25000,
+          "fieldCount": 18,
+          "ambiguousFields": "account_code; resolution_time; satisfaction_label",
+          "schemaVersion": "schema-demo-v1"
+        }
+      ]
+    },
+    {
+      "id": "privacy-policy-and-pii",
+      "title": "Privacy Policy and PII Review",
+      "description": "Classify sensitive fields, choose transformations, document privacy thresholds, and require accountable approval.",
+      "fields": [
+        {
+          "key": "datasetName",
+          "label": "Dataset name",
+          "type": "text",
+          "required": true,
+          "default": "Demo customer support events"
+        },
+        {
+          "key": "sensitiveFields",
+          "label": "Sensitive fields",
+          "type": "textarea",
+          "required": true,
+          "default": "email; phone; free_text; account_code"
+        },
+        {
+          "key": "transformationPolicy",
+          "label": "Transformation policy",
+          "type": "textarea",
+          "required": true,
+          "default": "Replace direct identifiers; synthesize quasi-identifiers; redact unsafe free text."
+        },
+        {
+          "key": "privacyTarget",
+          "label": "Privacy target",
+          "type": "text",
+          "required": true,
+          "default": "No exact direct-identifier matches"
+        },
+        {
+          "key": "reviewOwner",
+          "label": "Privacy review owner",
+          "type": "text",
+          "required": true,
+          "default": "Demo Privacy Reviewer"
+        }
+      ],
+      "states": [
+        "discovered",
+        "policy_draft",
+        "privacy_review",
+        "approved"
+      ],
+      "transitions": [
+        {
+          "id": "privacy-policy-and-pii-policy_draft",
+          "label": "Move to policy draft",
+          "from": [
+            "discovered"
+          ],
+          "to": "policy_draft"
+        },
+        {
+          "id": "privacy-policy-and-pii-privacy_review",
+          "label": "Move to privacy review",
+          "from": [
+            "policy_draft"
+          ],
+          "to": "privacy_review"
+        },
+        {
+          "id": "privacy-policy-and-pii-approved",
+          "label": "Move to approved",
+          "from": [
+            "privacy_review"
+          ],
+          "to": "approved"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "privacy-policy-and-pii-demo",
+          "state": "discovered",
+          "datasetName": "Demo customer support events",
+          "sensitiveFields": "email; phone; free_text; account_code",
+          "transformationPolicy": "Replace direct identifiers; synthesize quasi-identifiers; redact unsafe free text.",
+          "privacyTarget": "No exact direct-identifier matches",
+          "reviewOwner": "Demo Privacy Reviewer"
+        }
+      ]
+    },
+    {
+      "id": "distribution-profile",
+      "title": "Distribution Profile",
+      "description": "Measure distributions, dependencies, missingness, and temporal behavior and approve fidelity targets.",
+      "fields": [
+        {
+          "key": "datasetName",
+          "label": "Dataset name",
+          "type": "text",
+          "required": true,
+          "default": "Demo customer support events"
+        },
+        {
+          "key": "numericMetrics",
+          "label": "Numeric metrics",
+          "type": "textarea",
+          "required": true,
+          "default": "mean; quantiles; variance; missingness"
+        },
+        {
+          "key": "categoricalMetrics",
+          "label": "Categorical metrics",
+          "type": "textarea",
+          "required": true,
+          "default": "frequency; rare categories; conditional rates"
+        },
+        {
+          "key": "dependencyMethod",
+          "label": "Dependency method",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Correlation and conditional rates",
+            "Copula profile",
+            "Time-series profile"
+          ],
+          "default": "Correlation and conditional rates"
+        },
+        {
+          "key": "fidelityThreshold",
+          "label": "Minimum fidelity score",
+          "type": "number",
+          "required": true,
+          "default": 85
+        }
+      ],
+      "states": [
+        "calculating",
+        "profiled",
+        "data_science_review",
+        "approved"
+      ],
+      "transitions": [
+        {
+          "id": "distribution-profile-profiled",
+          "label": "Move to profiled",
+          "from": [
+            "calculating"
+          ],
+          "to": "profiled"
+        },
+        {
+          "id": "distribution-profile-data_science_review",
+          "label": "Move to data science review",
+          "from": [
+            "profiled"
+          ],
+          "to": "data_science_review"
+        },
+        {
+          "id": "distribution-profile-approved",
+          "label": "Move to approved",
+          "from": [
+            "data_science_review"
+          ],
+          "to": "approved"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "distribution-profile-demo",
+          "state": "calculating",
+          "datasetName": "Demo customer support events",
+          "numericMetrics": "mean; quantiles; variance; missingness",
+          "categoricalMetrics": "frequency; rare categories; conditional rates",
+          "dependencyMethod": "Correlation and conditional rates",
+          "fidelityThreshold": 85
+        }
+      ]
+    },
+    {
+      "id": "generation-job",
+      "title": "Synthetic Generation Job",
+      "description": "Configure a reproducible local generation run, review resource and privacy settings, and complete output creation.",
+      "fields": [
+        {
+          "key": "jobName",
+          "label": "Job name",
+          "type": "text",
+          "required": true,
+          "default": "support-events-demo-50k"
+        },
+        {
+          "key": "generator",
+          "label": "Generator",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Local tabular baseline",
+            "Rule-based",
+            "Time-series baseline"
+          ],
+          "default": "Local tabular baseline"
+        },
+        {
+          "key": "targetRows",
+          "label": "Target rows",
+          "type": "number",
+          "required": true,
+          "default": 50000
+        },
+        {
+          "key": "randomSeed",
+          "label": "Random seed",
+          "type": "number",
+          "required": true,
+          "default": 42017
+        },
+        {
+          "key": "outputLocation",
+          "label": "Output location",
+          "type": "text",
+          "required": true,
+          "default": "Local generated artifact"
+        }
+      ],
+      "states": [
+        "configured",
+        "running",
+        "quality_review",
+        "completed"
+      ],
+      "transitions": [
+        {
+          "id": "generation-job-running",
+          "label": "Move to running",
+          "from": [
+            "configured"
+          ],
+          "to": "running"
+        },
+        {
+          "id": "generation-job-quality_review",
+          "label": "Move to quality review",
+          "from": [
+            "running"
+          ],
+          "to": "quality_review"
+        },
+        {
+          "id": "generation-job-completed",
+          "label": "Move to completed",
+          "from": [
+            "quality_review"
+          ],
+          "to": "completed"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "generation-job-demo",
+          "state": "configured",
+          "jobName": "support-events-demo-50k",
+          "generator": "Local tabular baseline",
+          "targetRows": 50000,
+          "randomSeed": 42017,
+          "outputLocation": "Local generated artifact"
+        }
+      ]
+    },
+    {
+      "id": "edge-case-scenario-generation",
+      "title": "Edge-Case Scenario Generation",
+      "description": "Define rare but valid scenarios, constrain their prevalence, and approve scenario coverage for testing.",
+      "fields": [
+        {
+          "key": "scenarioName",
+          "label": "Scenario name",
+          "type": "text",
+          "required": true,
+          "default": "High-priority multilingual escalation"
+        },
+        {
+          "key": "scenarioDefinition",
+          "label": "Scenario definition",
+          "type": "textarea",
+          "required": true,
+          "default": "Priority critical, multilingual free text, two transfers, resolution over 48 hours."
+        },
+        {
+          "key": "targetPrevalencePercent",
+          "label": "Target prevalence percent",
+          "type": "number",
+          "required": true,
+          "default": 0.8
+        },
+        {
+          "key": "hardConstraints",
+          "label": "Hard constraints",
+          "type": "textarea",
+          "required": true,
+          "default": "Valid timestamps; supported language codes; no direct identifiers"
+        },
+        {
+          "key": "reviewOwner",
+          "label": "Domain review owner",
+          "type": "text",
+          "required": true,
+          "default": "Demo Support Operations Lead"
+        }
+      ],
+      "states": [
+        "draft",
+        "generated",
+        "domain_review",
+        "approved"
+      ],
+      "transitions": [
+        {
+          "id": "edge-case-scenario-generation-generated",
+          "label": "Move to generated",
+          "from": [
+            "draft"
+          ],
+          "to": "generated"
+        },
+        {
+          "id": "edge-case-scenario-generation-domain_review",
+          "label": "Move to domain review",
+          "from": [
+            "generated"
+          ],
+          "to": "domain_review"
+        },
+        {
+          "id": "edge-case-scenario-generation-approved",
+          "label": "Move to approved",
+          "from": [
+            "domain_review"
+          ],
+          "to": "approved"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "edge-case-scenario-generation-demo",
+          "state": "draft",
+          "scenarioName": "High-priority multilingual escalation",
+          "scenarioDefinition": "Priority critical, multilingual free text, two transfers, resolution over 48 hours.",
+          "targetPrevalencePercent": 0.8,
+          "hardConstraints": "Valid timestamps; supported language codes; no direct identifiers",
+          "reviewOwner": "Demo Support Operations Lead"
+        }
+      ]
+    },
+    {
+      "id": "quality-utility-validation",
+      "title": "Quality, Privacy, and Utility Validation",
+      "description": "Compare fidelity, leakage, duplication, and downstream utility and decide whether an output is releasable.",
+      "fields": [
+        {
+          "key": "jobName",
+          "label": "Job name",
+          "type": "text",
+          "required": true,
+          "default": "support-events-demo-50k"
+        },
+        {
+          "key": "fidelityScore",
+          "label": "Fidelity score",
+          "type": "number",
+          "required": true,
+          "default": 89
+        },
+        {
+          "key": "privacyRiskScore",
+          "label": "Privacy risk score",
+          "type": "number",
+          "required": true,
+          "default": 8
+        },
+        {
+          "key": "duplicateMatchRate",
+          "label": "Exact-match rate percent",
+          "type": "number",
+          "required": true,
+          "default": 0
+        },
+        {
+          "key": "downstreamUtility",
+          "label": "Downstream utility score",
+          "type": "number",
+          "required": true,
+          "default": 86
+        }
+      ],
+      "states": [
+        "queued",
+        "evaluated",
+        "review_board",
+        "released"
+      ],
+      "transitions": [
+        {
+          "id": "quality-utility-validation-evaluated",
+          "label": "Move to evaluated",
+          "from": [
+            "queued"
+          ],
+          "to": "evaluated"
+        },
+        {
+          "id": "quality-utility-validation-review_board",
+          "label": "Move to review board",
+          "from": [
+            "evaluated"
+          ],
+          "to": "review_board"
+        },
+        {
+          "id": "quality-utility-validation-released",
+          "label": "Move to released",
+          "from": [
+            "review_board"
+          ],
+          "to": "released"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "quality-utility-validation-demo",
+          "state": "queued",
+          "jobName": "support-events-demo-50k",
+          "fidelityScore": 89,
+          "privacyRiskScore": 8,
+          "duplicateMatchRate": 0,
+          "downstreamUtility": 86
+        }
+      ]
+    },
+    {
+      "id": "export-integration-readiness",
+      "title": "Export and Integration Readiness",
+      "description": "Package approved synthetic data and verify file, database, warehouse, or test-harness adapters safely.",
+      "fields": [
+        {
+          "key": "exportType",
+          "label": "Export type",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Local file",
+            "Database",
+            "Warehouse",
+            "Test harness"
+          ],
+          "default": "Local file"
+        },
+        {
+          "key": "format",
+          "label": "Format",
+          "type": "select",
+          "required": true,
+          "options": [
+            "CSV",
+            "JSONL",
+            "Parquet",
+            "SQL"
+          ],
+          "default": "Parquet"
+        },
+        {
+          "key": "provider",
+          "label": "Provider or adapter",
+          "type": "text",
+          "required": true,
+          "default": "Local filesystem fixture"
+        },
+        {
+          "key": "environment",
+          "label": "Environment",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Local fixture",
+            "Sandbox configuration",
+            "Production configuration"
+          ],
+          "default": "Local fixture"
+        },
+        {
+          "key": "testResult",
+          "label": "Test result",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Not run",
+            "Passed with fixture",
+            "Failed",
+            "Blocked"
+          ],
+          "default": "Not run"
+        }
+      ],
+      "states": [
+        "packaged",
+        "mapped",
+        "test_ready",
+        "verified"
+      ],
+      "transitions": [
+        {
+          "id": "export-integration-readiness-mapped",
+          "label": "Move to mapped",
+          "from": [
+            "packaged"
+          ],
+          "to": "mapped"
+        },
+        {
+          "id": "export-integration-readiness-test_ready",
+          "label": "Move to test ready",
+          "from": [
+            "mapped"
+          ],
+          "to": "test_ready"
+        },
+        {
+          "id": "export-integration-readiness-verified",
+          "label": "Move to verified",
+          "from": [
+            "test_ready"
+          ],
+          "to": "verified"
+        }
+      ],
+      "seeds": [
+        {
+          "id": "export-integration-readiness-demo",
+          "state": "packaged",
+          "exportType": "Local file",
+          "format": "Parquet",
+          "provider": "Local filesystem fixture",
+          "environment": "Local fixture",
+          "testResult": "Not run"
+        }
+      ]
+    }
+  ]
+}
